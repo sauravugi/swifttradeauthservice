@@ -1,4 +1,4 @@
-package com.swifttrade.auth.dto;
+package com.swifttrade.auth.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
