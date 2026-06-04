@@ -19,7 +19,7 @@ public class UserResponse {
 
     private String username;
 
-    private String role;
+    private Set<String> roles;
 
     private Boolean active;
 

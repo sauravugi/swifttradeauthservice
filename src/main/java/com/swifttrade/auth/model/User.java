@@ -39,9 +39,14 @@ public class User {
     @Column(name = "user_active")
     private Boolean active;
 
+    @ElementCollection(fetch = FetchType.EAGER)
     @Enumerated(EnumType.STRING)
-    @Column(name = "user_role")
-    private Role role;
+    @CollectionTable(
+            name = "st_user_roles",
+            joinColumns = @JoinColumn(name = "user_id")
+    )
+    @Column(name = "role")
+    private Set<Role> roles;
 
     @Column(name = "user_last_login_at")
     private LocalDateTime lastLoginAt;

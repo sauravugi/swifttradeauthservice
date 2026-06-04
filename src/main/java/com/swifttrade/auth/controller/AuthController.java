@@ -1,7 +1,9 @@
 package com.swifttrade.auth.controller;
 
 import com.swifttrade.auth.dto.request.LoginRequest;
+import com.swifttrade.auth.dto.request.SignUpRequest;
 import com.swifttrade.auth.dto.response.LoginResponse;
+import com.swifttrade.auth.dto.response.UserResponse;
 import com.swifttrade.auth.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -28,5 +30,12 @@ public class AuthController {
         authService.logout();
 
         return ResponseEntity.ok("Logout successful");
+    }
+
+    @PostMapping("/signup")
+    public ResponseEntity<UserResponse> signup(
+            @RequestBody SignUpRequest request) {
+
+        return ResponseEntity.ok(authService.signup(request));
     }
 }

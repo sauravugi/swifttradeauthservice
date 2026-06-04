@@ -10,8 +10,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
 @Service
 @RequiredArgsConstructor
 public class UserDetailsServiceImpl implements UserDetailsService {
@@ -32,11 +30,14 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 true,
                 true,
                 true,
-                List.of(
-                        new SimpleGrantedAuthority(
-                                "ROLE_" + user.getRole().name()
+                user.getRoles()
+                        .stream()
+                        .map(role ->
+                                new SimpleGrantedAuthority(
+                                        "ROLE_" + role.name()
+                                )
                         )
-                )
+                        .toList()
         );
     }
 }
