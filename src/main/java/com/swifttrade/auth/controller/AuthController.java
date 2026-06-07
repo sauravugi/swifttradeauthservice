@@ -2,13 +2,14 @@ package com.swifttrade.auth.controller;
 
 import com.swifttrade.auth.dto.request.LoginRequest;
 import com.swifttrade.auth.dto.request.SignUpRequest;
-import com.swifttrade.auth.dto.response.LoginResponse;
 import com.swifttrade.auth.dto.response.UserResponse;
 import com.swifttrade.auth.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -18,9 +19,7 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(
-            @Valid @RequestBody LoginRequest request) {
-
+    public ResponseEntity<Map<String, String>> login(@Valid @RequestBody LoginRequest request) {
         return ResponseEntity.ok(authService.login(request));
     }
 

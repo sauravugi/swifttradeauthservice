@@ -3,23 +3,19 @@ package com.swifttrade.auth.service.impl;
 import com.swifttrade.auth.configuration.JwtConfig;
 import com.swifttrade.auth.dto.request.LoginRequest;
 import com.swifttrade.auth.dto.request.SignUpRequest;
-import com.swifttrade.auth.dto.response.LoginResponse;
 import com.swifttrade.auth.dto.response.UserResponse;
 import com.swifttrade.auth.exception.InvalidCredentialsException;
-import com.swifttrade.auth.model.Department;
 import com.swifttrade.auth.model.User;
 import com.swifttrade.auth.repository.UserRepository;
 import com.swifttrade.auth.security.JwtService;
 import com.swifttrade.auth.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -31,59 +27,21 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public LoginResponse login(LoginRequest request) {
-        try {
-            authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            request.getUsername(),
-                            request.getPassword()
-                    )
-            );
-        } catch (BadCredentialsException e) {
-            throw new InvalidCredentialsException("Invalid username or password");
-        }
+    public Map<String, String> login(LoginRequest request) {
 
-        String accessToken = jwtService.generateToken(request.getUsername());
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        request.getUsername(),
+                        request.getPassword()
+                )
+        );
+
         User user = userRepository.findByUserName(request.getUsername())
                 .orElseThrow(() -> new InvalidCredentialsException("Invalid username or password"));
-        UserResponse userResponse = UserResponse.builder()
-                .id(user.getId())
-                .firstName(user.getFirstName())
-                .lastName(user.getLastName())
-                .email(user.getEmail())
-                .username(user.getUserName())
-                .roles(user.getRoles()
-                        .stream()
-                        .map(Enum::name)
-                        .collect(java.util.stream.Collectors.toSet()))
-                .active(user.getActive())
-                .clientId(
-                        user.getClient() != null
-                                ? user.getClient().getId()
-                                : null
-                )
-                .clientName(
-                        user.getClient() != null
-                                ? user.getClient().getName()
-                                : null
-                )
-                .departments(
-                        user.getDepartments() != null
-                                ? user.getDepartments()
-                                .stream()
-                                .map(Department::getName)
-                                .collect(Collectors.toSet())
-                                : Set.of()
-                )
-                .build();
 
-        return LoginResponse.builder()
-                .accessToken(accessToken)
-                .refreshToken("")
-                .tokenType("Bearer")
-                .expiresIn(jwtConfig.getExpiration())
-                .user(userResponse)
-                .build();
+        String accessToken = jwtService.generateToken(user);
+
+        return Map.of("accessToken", accessToken);
     }
 
     @Override

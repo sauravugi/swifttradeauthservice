@@ -1,6 +1,8 @@
 package com.swifttrade.auth.security;
 
 import com.swifttrade.auth.configuration.JwtConfig;
+import com.swifttrade.auth.model.Department;
+import com.swifttrade.auth.model.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
@@ -18,10 +20,25 @@ public class JwtService {
 
     private final JwtConfig jwtConfig;
 
-    public String generateToken(String username) {
+    public String generateToken(User user) {
+
         return Jwts.builder()
-                .subject(username)
-                .issuedAt(new Date(System.currentTimeMillis()))
+                .subject(user.getId())
+                .claim("username", user.getUserName())
+                .claim("email", user.getEmail())
+                .claim("employeeId", user.getEmployeeId())
+                .claim("roles", user.getRoles())
+                .claim("clientId", user.getClient().getId())
+                .claim("clientName", user.getClient().getName())
+                .claim("orgType", user.getClient().getOrganization().getType())
+                .claim("departments",
+                        user.getDepartments()
+                                .stream()
+                                .map(Department::getName)
+                                .toList()
+                )
+                .claim("active", user.getActive())
+                .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + jwtConfig.getExpiration()))
                 .signWith(getSigningKey())
                 .compact();
